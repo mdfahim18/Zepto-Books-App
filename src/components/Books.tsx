@@ -12,7 +12,6 @@ import { addToWishList, removeToWishList } from '@/utils/booksSlice';
 export default function Books({ book }: { book: BooksProps }) {
   const dispatch = useDispatch();
   const wishList = useSelector((state: RootState) => state.books.wishList);
-  const topGenres = [...book.subjects, ...book.bookshelves].slice(0, 4);
 
   const handleAddToWishList = (book: BooksProps) => {
     dispatch(addToWishList(book));

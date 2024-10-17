@@ -6,7 +6,6 @@ import { getSingleBook } from '@/utils/fetchBooks';
 import Image from 'next/image';
 import { useDispatch, useSelector } from 'react-redux';
 import { addToWishList, removeToWishList } from '@/utils/booksSlice';
-import { FaHeart, FaRegHeart } from 'react-icons/fa';
 import { RootState } from '../store';
 
 export default function Book({ params }: { params: { bookId: number } }) {
@@ -76,7 +75,7 @@ export default function Book({ params }: { params: { bookId: number } }) {
           Authors:
           {book.authors.map((author) => {
             return (
-              <span className='text-lg font-semibold'>
+              <span key={author.name} className='text-lg font-semibold'>
                 {author.name}, {author.birth_year} - {author.death_year}
               </span>
             );

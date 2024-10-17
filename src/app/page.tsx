@@ -105,7 +105,7 @@ export default function Home() {
 
   if (loading) {
     return (
-      <div className='w-full gap-8 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4'>
+      <div className=' max-w-7xl mx-auto gap-8 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4'>
         {Array.from({ length: 8 }).map((_, index) => (
           <section
             key={index}

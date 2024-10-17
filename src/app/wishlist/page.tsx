@@ -6,7 +6,6 @@ import { RootState } from '../store';
 import Image from 'next/image';
 import Link from 'next/link';
 import { BooksProps } from '../page';
-import { FaHeart } from 'react-icons/fa';
 import { removeToWishList } from '@/utils/booksSlice';
 
 export default function WishList() {
