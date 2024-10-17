@@ -105,11 +105,11 @@ export default function Home() {
 
   if (loading) {
     return (
-      <div className=' max-w-7xl mt-6 mx-auto grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4'>
+      <div className='w-full gap-8 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4'>
         {Array.from({ length: 8 }).map((_, index) => (
           <section
             key={index}
-            className='w-full px-6 py-10 mb-7 sm:w-[12rem] md:w-[14rem] animate-pulse transition-transform duration-300 flex flex-col gap-2 rounded-sm shadow-md bg-gray-200'
+            className='flex p-5 flex-col gap-2 rounded-sm  animate-pulse transition-transform duration-300 shadow-md bg-gray-200'
           >
             <div className='w-full h-48 bg-gray-300 rounded-md'></div>
             <div className='flex flex-col gap-1 mt-2'>
@@ -131,7 +131,7 @@ export default function Home() {
   if (error) {
     return (
       <div className='flex h-screen justify-center items-center'>
-        <h1 className='text-lg text-red-500'>{error}</h1>
+        <h1 className='text-lg text-red-500 font-semibold'>{error}</h1>
       </div>
     );
   }
@@ -146,23 +146,21 @@ export default function Home() {
   }
 
   return (
-    <main className='relative px-5 shadow-sm bg-white max-w-7xl mx-auto flex flex-col items-center gap-10 justify-center'>
-      <div>
-        <select
-          value={genre}
-          onChange={handleFilterChange}
-          className='p-2 mt-5 border w-[70px] sm:w-full border-gray-300 rounded'
-        >
-          <option value=''>All</option>
-          {uniqueGenres.map((item, index) => (
-            <option key={index} value={item}>
-              {item}
-            </option>
-          ))}
-        </select>
-      </div>
+    <main className=' bg-gray-100 max-w-7xl flex flex-col gap-8 mx-auto p-5'>
+      <select
+        value={genre}
+        onChange={handleFilterChange}
+        className='p-2 hidden sm:flex mt-5 border w-[70px] sm:w-full border-gray-300 rounded'
+      >
+        <option value=''>All</option>
+        {uniqueGenres.map((item, index) => (
+          <option key={index} value={item}>
+            {item}
+          </option>
+        ))}
+      </select>
 
-      <div className='grid gap-8 grid-cols-1 w-full sm:grid-cols-2 md:grid-cols-4 px-8 sm:px-0'>
+      <div className=' w-full gap-8 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4'>
         {currentBooks.map((book) => (
           <Books key={book.id} book={book} />
         ))}

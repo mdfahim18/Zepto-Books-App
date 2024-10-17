@@ -61,14 +61,15 @@ export default function Book({ params }: { params: { bookId: number } }) {
     );
   }
   return (
-    <div className=' max-w-7xl mx-auto mb-6 flex flex-col sm:flex-row justify-between gap-12 px-5 py-9'>
+    <div className=' max-w-7xl mx-auto bg-gray-100 sm:h-[90vh] mb-6 flex flex-col sm:flex-row justify-between gap-12 px-5 py-9'>
       <Image
         src={`${book.formats['image/jpeg']}`}
         alt={book.title}
         width={1000}
         height={1000}
-        className=' object-contain'
+        className=' object-contain max-w-[20rem]'
       />
+      <div className=' w-[1px] h-full bg-gray-800'></div>
       <div className=' flex flex-col gap-3 text-gray-700'>
         <h1 className=' text-xl font-semibold'>Title: {book.title}</h1>
         <h1 className=' text-lg font-semibold'>

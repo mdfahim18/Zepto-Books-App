@@ -12,7 +12,7 @@ import { addToWishList, removeToWishList } from '@/utils/booksSlice';
 export default function Books({ book }: { book: BooksProps }) {
   const dispatch = useDispatch();
   const wishList = useSelector((state: RootState) => state.books.wishList);
-  const topGenres = [...book.subjects, ...book.bookshelves].slice(0, 2);
+  const topGenres = [...book.subjects, ...book.bookshelves].slice(0, 4);
 
   const handleAddToWishList = (book: BooksProps) => {
     dispatch(addToWishList(book));
@@ -22,22 +22,28 @@ export default function Books({ book }: { book: BooksProps }) {
     dispatch(removeToWishList(book));
   };
   return (
-    <section className=' w-[80%] px-6 py-10 mb-7 sm:w-[14rem] md:w-[16rem] transition-transform duration-300 hover:scale-105 hover:shadow-lg flex flex-col justify-between gap-2 rounded-sm shadow-md'>
+    <section
+      key={book.id}
+      className='flex p-5 flex-col gap-2 rounded-sm shadow-md transition-transform duration-300 hover:scale-105 hover:shadow-lg h-full'
+    >
       <Link href={`/${book.id}`}>
         <Image
           src={`${book.formats['image/jpeg']}`}
           alt={book.title}
           width={500}
           height={500}
-          className=' object-cover cursor-pointer'
+          className='object-contain cursor-pointer w-full h-[12rem] sm:h-[16rem] rounded-md'
         />
       </Link>
-      <div className=' flex flex-col gap-1 text-gray-800'>
-        <h1 className=' text-xl font-semibold '>{book.title}</h1>
-        <h2 className=' text-lg font-semibold'>
-          By: {book.authors.map((author) => author.name).join(',) ')}
+      <div className='flex flex-col justify-between gap-1 text-gray-800 flex-grow'>
+        <h1 className='text-xl font-semibold'>{book.title}</h1>
+        <h2 className='text-lg font-semibold'>
+          By: {book.authors.map((author) => author.name).join(', ')}
         </h2>
-        <p className='font-semibold'>Genre: {topGenres.join(', ')}</p>
+        <p className='font-semibold'>
+          Genre:
+          {[...book.subjects, ...book.bookshelves].slice(0, 4).join(', ')}
+        </p>
         <p className='font-semibold'>Id: {book.id}</p>
         <div className=' flex justify-between items-center'>
           <Link
