@@ -1,101 +1,198 @@
-import Image from "next/image";
+'use client';
+
+import React, { useEffect, useState } from 'react';
+import Books from '../components/Books';
+import { getBooks } from '../utils/fetchBooks';
+
+interface Author {
+  name: string;
+  birth_year: number | null;
+  death_year: number | null;
+}
+
+interface Formats {
+  'image/jpeg'?: string;
+  [key: string]: string | undefined;
+}
+
+export interface BooksProps {
+  id: number;
+  title: string;
+  authors: Author[];
+  bookshelves: string[];
+  copyright: boolean;
+  download_count: number;
+  formats: Formats;
+  languages: string[];
+  media_type: string;
+  subjects: string[];
+  translators: Author[];
+}
 
 export default function Home() {
-  return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="https://nextjs.org/icons/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
+  const [books, setBooks] = useState<BooksProps[]>([]);
+  const [filteredBooks, setFilteredBooks] = useState<BooksProps[]>([]);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string | null>(null);
+  const [genre, setGenre] = useState<string>('');
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const booksPerPage = 8;
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+  useEffect(() => {
+    const fetchBooks = async () => {
+      setLoading(true);
+      try {
+        const { results } = await getBooks();
+        setBooks(results);
+        setFilteredBooks(results);
+        setError(null);
+        setLoading(false);
+      } catch (error) {
+        console.error('Error fetching books:', error);
+        setError('An error occurred while fetching books. Please reload');
+        setLoading(false);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchBooks();
+  }, []);
+
+  const handleFilterChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    const selectedFilter = event.target.value;
+    setGenre(selectedFilter);
+    setCurrentPage(1);
+
+    if (selectedFilter === '') {
+      setFilteredBooks(books);
+    } else {
+      const filtered = books.filter(
+        (book) =>
+          book.subjects.includes(selectedFilter) ||
+          book.bookshelves.includes(selectedFilter)
+      );
+      setFilteredBooks(filtered);
+    }
+  };
+
+  const uniqueGenres = Array.from(
+    new Set(
+      books.length > 0
+        ? books.flatMap((book) => [
+            ...(book.subjects || []),
+            ...(book.bookshelves || []),
+          ])
+        : []
+    )
+  );
+
+  const indexOfLastBook = currentPage * booksPerPage;
+  const indexOfFirstBook = indexOfLastBook - booksPerPage;
+  const currentBooks = filteredBooks.slice(indexOfFirstBook, indexOfLastBook);
+  const totalPages = Math.ceil(filteredBooks.length / booksPerPage);
+
+  const handleNextPage = () => {
+    if (currentPage < totalPages) {
+      setCurrentPage((prevPage) => prevPage + 1);
+    }
+  };
+
+  const handlePreviousPage = () => {
+    if (currentPage > 1) {
+      setCurrentPage((prevPage) => prevPage - 1);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className=' max-w-7xl mt-6 mx-auto grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4'>
+        {Array.from({ length: 8 }).map((_, index) => (
+          <section
+            key={index}
+            className='w-full px-6 py-10 mb-7 sm:w-[12rem] md:w-[14rem] animate-pulse transition-transform duration-300 flex flex-col gap-2 rounded-sm shadow-md bg-gray-200'
           >
-            <Image
-              className="dark:invert"
-              src="https://nextjs.org/icons/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
-        </div>
-      </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
+            <div className='w-full h-48 bg-gray-300 rounded-md'></div>
+            <div className='flex flex-col gap-1 mt-2'>
+              <div className='h-6 bg-gray-300 rounded-md'></div>
+              <div className='h-5 bg-gray-300 rounded-md'></div>
+              <div className='h-4 bg-gray-300 rounded-md'></div>
+              <div className='h-4 bg-gray-300 rounded-md'></div>
+              <div className='flex justify-between items-center mt-3'>
+                <div className='h-4 bg-gray-300 rounded-md w-20'></div>
+                <div className='h-6 w-6 bg-gray-300 rounded-full'></div>
+              </div>
+            </div>
+          </section>
+        ))}
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className='flex h-screen justify-center items-center'>
+        <h1 className='text-lg text-red-500'>{error}</h1>
+      </div>
+    );
+  }
+
+  if (filteredBooks.length === 0) {
+    return (
+      <div className='flex flex-col gap-4 h-screen justify-center items-center'>
+        <h1 className='text-3xl'>No books available</h1>
+        <h2 className=' text-2l'>Please reload the page</h2>
+      </div>
+    );
+  }
+
+  return (
+    <main className='relative px-5 shadow-sm bg-white max-w-7xl mx-auto flex flex-col items-center gap-10 justify-center'>
+      <div>
+        <select
+          value={genre}
+          onChange={handleFilterChange}
+          className='p-2 mt-5 border w-[70px] sm:w-full border-gray-300 rounded'
         >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
+          <option value=''>All</option>
+          {uniqueGenres.map((item, index) => (
+            <option key={index} value={item}>
+              {item}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      <div className='grid gap-8 grid-cols-1 w-full sm:grid-cols-2 md:grid-cols-4 px-8 sm:px-0'>
+        {currentBooks.map((book) => (
+          <Books key={book.id} book={book} />
+        ))}
+      </div>
+
+      <div className='flex justify-center gap-4 mb-16'>
+        <button
+          onClick={handlePreviousPage}
+          disabled={currentPage === 1}
+          className={`px-5 py-3 ${
+            currentPage === 1 ? 'bg-gray-300' : 'bg-pink-600 text-white'
+          } rounded`}
         >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
+          Previous
+        </button>
+        <span className='text-xl'>
+          Page {currentPage} of {totalPages}
+        </span>
+        <button
+          onClick={handleNextPage}
+          disabled={currentPage === totalPages}
+          className={`px-5 py-3 ${
+            currentPage === totalPages
+              ? 'bg-gray-300'
+              : 'bg-pink-600 text-white'
+          } rounded`}
         >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
+          Next
+        </button>
+      </div>
+    </main>
   );
 }
